@@ -1,5 +1,12 @@
 package dad.IMC;
 
+import org.controlsfx.validation.Severity;
+import org.controlsfx.validation.ValidationResult;
+import org.controlsfx.validation.ValidationSupport;
+import org.controlsfx.validation.Validator;
+
+
+
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringExpression;
@@ -102,7 +109,7 @@ public class IMC extends Application {
 		
 		//CONDICION PARA EVITAR NaN E infinity
 		BooleanProperty div = new SimpleBooleanProperty();
-		div.bind(calculo.greaterThan(18.5f).and(calculo.lessThan(30f)));
+		div.bind(calculo.greaterThan(10f).and(calculo.lessThan(50f)));
 		
 		IMC.textProperty().bind(Bindings.concat(Bindings.when(div).then(calculo.asString("%.2f")).otherwise("")));
 		
@@ -125,9 +132,45 @@ public class IMC extends Application {
 		
 		//CONDICION PARA EVITAR QUE SALGA NADA ANTES DE TENER EL RESULTADO FINAL
 		BooleanProperty div2 = new SimpleBooleanProperty();
-		div2.bind(calculo.greaterThan(18.5f).and(calculo.lessThan(30f)));
+		div2.bind(calculo.greaterThan(10f).and(calculo.lessThan(50f)));
 		resultado.textProperty().bind(Bindings.concat(Bindings.when(div2).then(finalRes).otherwise("")));
+		
+		Validator<String> onPesoCheck = (control, value) -> {
+			
+			double d;
+			
+			try {
+				
+				d = Double.parseDouble(value);
+				
+				return ValidationResult.fromMessageIf(control, "El PESO debe ser mayor de 0 y menor de 300.", Severity.ERROR, (d < 0 || d > 300) );
+				
+			} catch (Exception e) {
+				
+				return ValidationResult.fromError(control, "Este campo solo permite números.");
+			}
+			
+		};
 
+		Validator<String> onAlturaCheck = (control, value) -> {
+			
+			double d;
+			
+			try {
+				
+				d = Double.parseDouble(value);
+				
+				return ValidationResult.fromMessageIf(control, "La ALTURA debe ser mayor de 0 y menor de 300.", Severity.ERROR, (d < 0 || d > 300) );
+				
+			} catch (Exception e) {
+				
+				return ValidationResult.fromError(control, "Este campo solo permite números");
+			}
+		};
+		
+		ValidationSupport support = new ValidationSupport();
+		support.registerValidator(texto1, onPesoCheck);
+		support.registerValidator(texto2, onAlturaCheck);
 	}
 	
 	public static void main(String[] args) {
